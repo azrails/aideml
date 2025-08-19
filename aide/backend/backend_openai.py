@@ -59,7 +59,7 @@ def query(
 
     model_name = filtered_kwargs.get("model", "")
     is_openai_model = re.match(r"^(gpt-|o\d-|codex-mini-latest$)", model_name)
-    use_chat_api = os.getenv("OPENAI_BASE_URL") is not None and not is_openai_model
+    use_chat_api = os.getenv("OPENAI_BASE_URL") is not None
 
     if use_chat_api:
         _setup_custom_client()
