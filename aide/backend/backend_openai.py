@@ -63,19 +63,8 @@ def query(
 
     if use_chat_api:
         _setup_custom_client()
-        messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
-        if func_spec is not None:
-            filtered_kwargs["tools"] = [func_spec.as_openai_tool_dict]
-            filtered_kwargs["tool_choice"] = func_spec.openai_tool_choice_dict
-    else:
-        messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
-        for i in range(len(messages)):
-            messages[i]["content"] = [
-                {"type": "input_text", "text": messages[i]["content"]}
-            ]
-        if func_spec is not None:
-            filtered_kwargs["tools"] = [func_spec.as_openai_responses_tool_dict]
-            filtered_kwargs["tool_choice"] = func_spec.openai_responses_tool_choice_dict
+
+    messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
 
 
     if func_spec is not None:
