@@ -54,15 +54,12 @@ def query(
     convert_system_to_user: bool = False,
     **model_kwargs,
 ) -> tuple[OutputType, float, int, int, dict]:
-    _setup_openai_client()
     filtered_kwargs: dict = select_values(notnone, model_kwargs)  # type: ignore
-
-    model_name = filtered_kwargs.get("model", "")
-    is_openai_model = re.match(r"^(gpt-|o\d-|codex-mini-latest$)", model_name)
     use_chat_api = os.getenv("OPENAI_BASE_URL") is not None
-
     if use_chat_api:
         _setup_custom_client()
+    else:
+        _setup_openai_client()
 
     messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
 
@@ -72,9 +69,10 @@ def query(
         # force the model the use the function
         filtered_kwargs["tool_choice"] = func_spec.openai_tool_choice_dict
 
+    client_to_use = _custom_client if _custom_client else _client
     t0 = time.time()
     completion = backoff_create(
-        _client.chat.completions.create,
+        client_to_use.chat.completions.create,
         OPENAI_TIMEOUT_EXCEPTIONS,
         messages=messages,
         **filtered_kwargs,
