@@ -3,6 +3,8 @@
 import json
 import logging
 import time
+import os
+import re
 
 from aide.backend.utils import (
     FunctionSpec,
@@ -17,6 +19,7 @@ logger = logging.getLogger("aide")
 
 _client: openai.OpenAI = None  # type: ignore
 
+OPENAI_BASE_URL = "https://api.openai.com/v1"
 
 OPENAI_TIMEOUT_EXCEPTIONS = (
     openai.RateLimitError,
@@ -25,12 +28,24 @@ OPENAI_TIMEOUT_EXCEPTIONS = (
     openai.InternalServerError,
 )
 
+_client: openai.OpenAI = None  # type: ignore
+_custom_client: openai.OpenAI = None  # type: ignore
 
 @once
 def _setup_openai_client():
     global _client
-    _client = openai.OpenAI(max_retries=0)
+    api_key = os.getenv("OPENAI_API_KEY")
+    _client = openai.OpenAI(api_key=api_key, base_url=OPENAI_BASE_URL, max_retries=0)
 
+@once
+def _setup_custom_client():
+    global _custom_client
+    base_url = os.getenv("OPENAI_BASE_URL")
+    api_key = os.getenv("OPENAI_API_KEY")
+    if base_url:
+        _custom_client = openai.OpenAI(
+            api_key=api_key, base_url=base_url, max_retries=0
+        )
 
 def query(
     system_message: str | None,
@@ -42,7 +57,26 @@ def query(
     _setup_openai_client()
     filtered_kwargs: dict = select_values(notnone, model_kwargs)  # type: ignore
 
-    messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
+    model_name = filtered_kwargs.get("model", "")
+    is_openai_model = re.match(r"^(gpt-|o\d-|codex-mini-latest$)", model_name)
+    use_chat_api = os.getenv("OPENAI_BASE_URL") is not None and not is_openai_model
+
+    if use_chat_api:
+        _setup_custom_client()
+        messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
+        if func_spec is not None:
+            filtered_kwargs["tools"] = [func_spec.as_openai_tool_dict]
+            filtered_kwargs["tool_choice"] = func_spec.openai_tool_choice_dict
+    else:
+        messages = opt_messages_to_list(system_message, user_message, convert_system_to_user=convert_system_to_user)
+        for i in range(len(messages)):
+            messages[i]["content"] = [
+                {"type": "input_text", "text": messages[i]["content"]}
+            ]
+        if func_spec is not None:
+            filtered_kwargs["tools"] = [func_spec.as_openai_responses_tool_dict]
+            filtered_kwargs["tool_choice"] = func_spec.openai_responses_tool_choice_dict
+
 
     if func_spec is not None:
         filtered_kwargs["tools"] = [func_spec.as_openai_tool_dict]
