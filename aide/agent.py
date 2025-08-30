@@ -369,6 +369,7 @@ class Agent:
         # if the result_node is the best node, cache its submission.csv and solution.py
         # to best_solution/ by copying it there
         best_node = self.journal.get_best_node()
+        print(f"Best node metric: {best_node.metric}")
         if best_node is not None:
             if best_node.id == result_node.id:
                 logger.info(f"Node {result_node.id} is the best node so far")
