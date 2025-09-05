@@ -5,8 +5,8 @@ humanize==4.8.0
 jsonschema==4.19.2
 numpy==1.26.2
 openai>=1.69.0
-anthropic>=0.20.0
-pandas==2.1.4
+anthropic
+pandas
 pytest==7.4.3
 requests>=2.32.4
 scikit-learn==1.5.0
@@ -78,7 +78,7 @@ fastai
 gym
 optuna
 transformers
-datasets==2.1.0
+datasets
 torchmetrics
 pytorch-lightning
 sympy
