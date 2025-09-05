@@ -16,6 +16,7 @@ import traceback
 from dataclasses import dataclass
 from multiprocessing import Process, Queue
 from pathlib import Path
+import types
 
 import humanize
 from dataclasses_json import DataClassJsonMixin
@@ -135,7 +136,13 @@ class Interpreter:
     ) -> None:
         self.child_proc_setup(result_outq)
 
+        #true scope for __name__=="__main__"
         global_scope: dict = {}
+        main_mod = types.ModuleType("__main__")
+        main_mod.__file__ = self.agent_file_name
+        sys.modules["__main__"] = main_mod
+        global_scope = main_mod.__dict__
+
         while True:
             code = code_inq.get()
             os.chdir(str(self.working_dir))

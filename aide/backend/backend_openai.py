@@ -59,8 +59,8 @@ def query(
     _setup_openai_client()
 
     filtered_kwargs: dict = select_values(notnone, model_kwargs)
-    if "max_tokens" in filtered_kwargs:
-        filtered_kwargs["max_output_tokens"] = filtered_kwargs.pop("max_tokens")
+    # if "max_tokens" in filtered_kwargs:
+    #     filtered_kwargs["max_output_tokens"] = filtered_kwargs.pop("max_tokens")
 
     if (
         re.match(r"^o\d", filtered_kwargs["model"])
@@ -70,7 +70,8 @@ def query(
 
     # Use different API based on whether this is a non-OpenAI model with custom base URL
     model_name = filtered_kwargs.get("model", "")
-    is_openai_model = re.match(r"^(gpt-|o\d-|codex-mini-latest$)", model_name)
+    #exclude gpt oss model
+    is_openai_model = re.match(r"^(gpt-(?!oss)([a-zA-Z0-9._-]+)?|o\d-|codex-mini-latest)$", model_name)
     use_chat_api = os.getenv("OPENAI_BASE_URL") is not None and not is_openai_model
 
     if use_chat_api:
