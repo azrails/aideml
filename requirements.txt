@@ -85,7 +85,6 @@ optuna==4.5.0
 
 #EXTRA
 imagecodecs==2025.8.2
-pytest==8.4.1
 PyYAML==6.0.2
 sympy==1.14.0
 tiktoken==0.11.0
