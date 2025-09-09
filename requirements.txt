@@ -1,92 +1,94 @@
 # AIDE requirements
-black>=24.3.0
-funcy>=2.0
-humanize>=4.8.0
-jsonschema>=4.19.2
-numpy
+black==24.3.0
+funcy==2.0
+humanize==4.8.0
+jsonschema==4.19.2
+numpy==1.26.2
 openai>=1.69.0
-anthropic
-pandas
+anthropic>=0.20.0
+pandas==2.1.4
 pytest==7.4.3
 requests>=2.32.4
-scikit-learn
+scikit-learn==1.5.0
 rich==13.7.0
-scipy
+scipy==1.11.4
 dataclasses_json>=0.6.4
 omegaconf>=2.3.0
 loguru==0.7.2
 shutup>=0.2.0
+tqdm==4.66.3
 coolname>=2.2.0
 igraph>=0.11.3
 genson>=1.2.0
 
-#DL LIBRARIES
-keras==3.11.3
-torch==2.8.0 
-torchvision==0.23.0 
-torchaudio==2.8.0
-torch-geometric==2.6.1
-kornia==0.8.1
-librosa==0.11.0
-langchain==0.3.27
-langgraph==0.6.6
-langchain-ollama==0.3.7
-langchain-openai==0.3.32
-langchain-anthropic==0.3.19
-peft==0.17.1
-albumentations==2.0.8
-pytorch-lightning==2.5.3
-sentence-transformers==5.1.0
-tensorflow==2.20.0
-timm==1.0.19
-torchmetrics==1.8.1
-transformers==4.55.4
+# agent requirements (packages that the agent might need)
+torch
+torchvision
+torchaudio
+torchtext
 
+lightgbm
+matplotlib
+seaborn
 
-#ML LIBRARIES
-lightgbm==4.6.0
-opencv-python==4.12.0.88
-pandas==2.3.2
-pillow==11.3.0
-pyarrow==21.0.0
-pyocr==0.8.5
-pyparsing==3.2.3
-nltk==3.9.1
-sacrebleu==2.5.1
-rouge-score==0.1.2
-scikit-image==0.25.2
-scikit-learn==1.7.1
-scipy==1.16.1
-sentencepiece==0.2.1
-spacy==3.8.7
-xgboost==3.0.4
+# tensorflow
+# tensorflow-io
+# tensorflow_hub
+# tf-keras
+# tensorflow_decision_forests
+# keras
+# keras-cv
+# keras-nlp
 
-#SIMULATION
-markovify==0.9.4
-networkx==3.5
-gymnasium==1.2.0
+gensim
 
-#VISUALIZATION
-matplotlib==3.10.5
-plotly==6.3.0
-seaborn==0.13.2
-
-#API
-anthropic==0.64.0
-openai==1.102.0
-
-#ACCELERATE
-numba==0.61.2
-accelerate==1.10.1
-
-#OPTIMIZATION
-optuna==4.5.0
-
-#EXTRA
-imagecodecs==2025.8.2
-PyYAML==6.0.2
-sympy==1.14.0
-tiktoken==0.11.0
-tqdm==4.67.1
-xlrd==2.0.2
-fastapi==0.116.1
+scikit-image
+opencv-python
+scipy
+scikit-learn
+biopython
+imbalanced-learn
+h5py
+biopython
+numba
+arrow
+markovify
+imgaug
+scikit-optimize
+plotly
+hyperopt
+bayesian-optimization
+imagecodecs
+hmmlearn
+bayespy==0.5.1
+sklearn-pandas
+tensorpack
+sentencepiece
+librosa
+ipykernel
+ipython
+nbformat
+kornia
+Pillow
+pyparsing
+pytz
+PyYAML
+tqdm
+fastai
+gym
+optuna
+transformers
+datasets==2.1.0
+torchmetrics
+pytorch-lightning
+sympy
+timm
+torchinfo
+pdf2image
+PyPDF
+pyocr
+pyarrow
+xlrd
+backoff
+streamlit==1.40.2
+python-dotenv
