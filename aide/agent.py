@@ -319,17 +319,19 @@ class Agent:
                 temperature=self.acfg.feedback.temp,
             ),
         )
-
-        # if the metric isn't a float then fill the metric with the worst metric
-        if not isinstance(response["metric"], float):
-            response["metric"] = None
-
-        node.analysis = response["summary"]
-        node.is_buggy = (
-            response["is_bug"]
-            or node.exc_type is not None
-            or response["metric"] is None
-        )
+        try:
+            # if the metric isn't a float then fill the metric with the worst metric
+            if not isinstance(response["metric"], float):
+                response["metric"] = None
+    
+            node.analysis = response["summary"]
+            node.is_buggy = (
+                response["is_bug"]
+                or node.exc_type is not None
+                or response["metric"] is None
+            )
+        except Exception as e:
+            node.is_buggy = True
 
         if node.is_buggy:
             node.metric = WorstMetricValue()
