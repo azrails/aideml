@@ -20,6 +20,10 @@ tqdm==4.66.3
 coolname>=2.2.0
 igraph>=0.11.3
 genson>=1.2.0
+google-auth-oauthlib>=1.2.2
+google-auth>=2.45.0
+google-api-python-client>=2.187.0
+google>=3.0.0
 
 # agent requirements (packages that the agent might need)
 torch

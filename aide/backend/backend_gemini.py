@@ -8,6 +8,8 @@ import time
 from .utils import FunctionSpec, OutputType, opt_messages_to_list, backoff_create
 from funcy import notnone, once, select_values
 import openai
+import google.oauth2.service_account
+import google.auth.transport.requests
 
 logger = logging.getLogger("aide")
 
@@ -20,16 +22,41 @@ GEMINI_TIMEOUT_EXCEPTIONS = (
     openai.InternalServerError,
 )
 
+def get_access_token(service_account_file_path):
+    credentials = google.oauth2.service_account.Credentials.from_service_account_file(
+        service_account_file_path,
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+
+   )
+    credentials.refresh(google.auth.transport.requests.Request())
+    return credentials
+
+def setup_vertex_client():
+    service_account_file_path = os.getenv("VERTEX_SERVICE_ACCOUNT", None)
+    if service_account_file_path is None:
+        raise "Need to provide service account credentials for vertex"
+    location = os.getenv("VERTEX_LOCATION", "us-central1")
+    credentials = get_access_token(service_account_file_path)
+    with open(service_account_file_path, "r") as f:
+        user_creds = json.load(f)
+
+    client = openai.OpenAI(
+        base_url=f"https://{location}-aiplatform.googleapis.com/v1/projects/{user_creds["project_id"]}/locations/{location}/endpoints/openapi",
+        api_key=credentials.token,
+        max_retries=0,
+    )
+    return client
 
 @once
 def _setup_gemini_client():
     global _client
-    gemini_base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
-
-    # Check for Gemini API key in environment variables
-    api_key = os.getenv("GEMINI_API_KEY")
-
-    _client = openai.OpenAI(api_key=api_key, base_url=gemini_base_url, max_retries=0)
+    use_vertex = bool(os.getenv("VERTEX", False))
+    if use_vertex:
+        _client = setup_vertex_client()
+    else:
+        gemini_base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
+        api_key = os.getenv("GEMINI_API_KEY")
+        _client = openai.OpenAI(api_key=api_key, base_url=gemini_base_url, max_retries=0)
 
 
 def query(
