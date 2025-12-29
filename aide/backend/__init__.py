@@ -9,7 +9,10 @@ logger = logging.getLogger("aide")
 
 def determine_provider(model: str) -> str:
     # Check if model matches OpenAI patterns first
-    if re.match(r"^(gpt-.*|o\d+(-.*)?|codex-mini-latest)$", model):
+    use_vertex = bool(os.getenv("VERTEX", False))
+    if use_vertex:
+        return "gemini"
+    elif re.match(r"^(gpt-.*|o\d+(-.*)?|codex-mini-latest)$", model):
         return "openai"
     elif model.startswith("claude-"):
         return "anthropic"
