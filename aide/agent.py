@@ -2,6 +2,7 @@ import logging
 import random
 from typing import Any, Callable, cast
 import time
+import shutil
 
 import humanize
 from .backend import FunctionSpec, query
