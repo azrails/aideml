@@ -13,7 +13,8 @@ from .utils.metric import MetricValue, WorstMetricValue
 from .utils.response import extract_code, extract_text_up_to_code, wrap_code
 
 logger = logging.getLogger("aide")
-
+def format_time(time_in_sec: int):
+    return f"{time_in_sec // 3600}hrs {(time_in_sec % 3600) // 60}mins {time_in_sec % 60}secs"
 
 ExecCallbackType = Callable[[str, bool], ExecutionResult]
 
