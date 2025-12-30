@@ -1,6 +1,7 @@
 import logging
 import random
 from typing import Any, Callable, cast
+import time
 
 import humanize
 from .backend import FunctionSpec, query
@@ -57,6 +58,8 @@ class Agent:
         self.acfg = cfg.agent
         self.journal = journal
         self.data_preview: str | None = None
+        self.current_step = 0
+        self.start_time = time.time()
 
     def search_policy(self) -> Node | None:
         """Select a node to work on (or None to draft a new node)."""
@@ -116,7 +119,12 @@ class Agent:
 
     @property
     def _prompt_impl_guideline(self):
+        tot_time_elapsed = time.time() - self.start_time
+        tot_time_remaining = self.acfg.time_limit - tot_time_elapsed
+        exec_timeout = int(min(self.cfg.exec.timeout, tot_time_remaining))
         impl_guideline = [
+            f"<TOTAL_TIME_REMAINING: {format_time(tot_time_remaining)}>",
+            f"<TOTAL_STEPS_REMAINING: {self.acfg.steps - self.current_step}>",
             "The code should **implement the proposed solution** and **print the value of the evaluation metric computed on a hold-out validation set**.",
             "The code should be a single-file python program that is self-contained and can be executed as-is.",
             "No parts of the code should be skipped, don't terminate the before finishing the script.",
@@ -292,6 +300,29 @@ class Agent:
             exec_result=exec_callback(result_node.code, True),
         )
         self.journal.append(result_node)
+        best_node = self.journal.get_best_node()
+        if best_node is not None:
+            if best_node.id == result_node.id:
+                logger.info(f"Node {result_node.id} is the best node so far")
+                best_solution_dir = self.cfg.workspace_dir / "best_solution"
+                best_solution_dir.mkdir(exist_ok=True, parents=True)
+                # copy submission/submission.csv to best_submission/submission.csv
+                best_submission_dir = self.cfg.workspace_dir / "best_submission"
+                best_submission_dir.mkdir(exist_ok=True, parents=True)
+                shutil.copy(
+                    self.cfg.workspace_dir / "submission" / "submission.csv",
+                    best_submission_dir,
+                )
+                # copy solution.py and relevant node id to best_solution/
+                with open(best_solution_dir / "solution.py", "w") as f:
+                    f.write(result_node.code)
+                # take note of the node id of the best node
+                with open(best_solution_dir / "node_id.txt", "w") as f:
+                    f.write(str(result_node.id))
+            else:
+                logger.info(f"Node {result_node.id} is not the best node")
+                logger.info(f"Node {best_node.id} is still the best node")
+        self.current_step += 1
 
     def parse_exec_result(self, node: Node, exec_result: ExecutionResult):
         logger.info(f"Agent is parsing execution results for node {node.id}")
