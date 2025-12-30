@@ -41,7 +41,7 @@ def setup_vertex_client():
         user_creds = json.load(f)
 
     client = openai.OpenAI(
-        base_url=f"https://{location}-aiplatform.googleapis.com/v1/projects/{user_creds["project_id"]}/locations/{location}/endpoints/openapi",
+        base_url=f'https://{location}-aiplatform.googleapis.com/v1/projects/{user_creds["project_id"]}/locations/{location}/endpoints/openapi',
         api_key=credentials.token,
         max_retries=0,
     )
