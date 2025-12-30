@@ -44,6 +44,7 @@ class AgentConfig:
     steps: int
     k_fold_validation: int
     expose_prediction: bool
+    time_limit: int
     data_preview: bool
 
     code: StageConfig
