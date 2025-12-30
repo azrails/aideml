@@ -40,6 +40,7 @@ agent:
   expose_prediction: False
   # whether to provide the agent with a preview of the data
   data_preview: True
+  time_limit: 86400
 
   # LLM settings for coding
   code:
